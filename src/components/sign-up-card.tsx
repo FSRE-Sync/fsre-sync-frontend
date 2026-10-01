@@ -49,12 +49,14 @@ const SignUpCard: React.FC<Props> = ({
     resolver: zodResolver(formSchema),
   });
   const { isPending, mutateAsync } = useMutation<
-    MessagingSubscription,
+    MessagingSubscription[],
     HttpResponse<never, FsreError>,
     z.infer<typeof formSchema>
   >({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      return (await client.messaging.subscribe(data)).data;
+      // Times in notification emails are shown in the subscriber's time zone.
+      const { timeZone } = Intl.DateTimeFormat().resolvedOptions();
+      return (await client.messaging.subscribe({ ...data, timeZone })).data;
     },
     mutationKey: ["subscribe"],
     onError: ({ error }) => {

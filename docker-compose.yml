@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: fsre-timetable-notify-frontend
+    container_name: fsre-sync-frontend
     networks:
       - nginx-proxy
     restart: unless-stopped

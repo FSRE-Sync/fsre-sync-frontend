@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "fsre-sync-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-client": "swagger-typescript-api generate -p http://mapokapo.zapto.org:5000/v3/api-docs -o ./src/api -n api.ts -r --union-enums --add-readonly --route-types --enum-names-as-values --api-class-name Api --patch"
+    "generate-client": "swagger-typescript-api generate -p https://fsre-app.mapokapo.cc/api/v3/api-docs -o ./src/api -n api.ts -r --union-enums --add-readonly --route-types --enum-names-as-values --api-class-name Api --patch"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

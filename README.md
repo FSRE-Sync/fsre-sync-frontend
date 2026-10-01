@@ -1,6 +1,6 @@
-# FSRE Timetable Notifier Frontend
+# FSRE Sync Frontend
 
-Frontend for the FSRE Timetable Notifier project. Made with Typescript, React, and Tailwind.
+Frontend for the FSRE Sync project. Made with Typescript, React, and Tailwind.
 
 ## Components
 

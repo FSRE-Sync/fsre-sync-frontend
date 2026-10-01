@@ -10,342 +10,185 @@
  * ---------------------------------------------------------------
  */
 
-/** An error thrown by the FSRE API */
-export interface FsreError {
-  /**
-   * HTTP status code of the error
-   * @example "500"
-   */
-  status: FsreErrorStatusEnum;
-  /**
-   * Error code of the error
-   * @example "Internal Server Error"
-   */
-  error: string;
-  /**
-   * An message which describes the error
-   * @example "An error occurred while processing the request"
-   */
-  message: string;
-  /**
-   * Optional details of the error
-   * @example "The request failed because the network is unreachable"
-   */
-  details?: string;
-}
-
-/** DTO to subscribe an email to a specific study program */
-export interface MessagingSubscribeDto {
-  /** The email of the subscriber */
-  email?: string;
-  /** The FCM token of the subscriber */
-  fcmToken?: string;
-  /**
-   * The ID of the study program to subscribe to
-   * @format int64
-   */
-  studyProgramId: number;
-}
-
-/** A subscription to receive messages */
-export interface MessagingSubscription {
-  /**
-   * The ID of the subscription
-   * @format uuid
-   */
-  id: string;
-  /** The FCM token of the subscription */
-  fcmToken?: string;
-  /** The email of the subscription */
-  email?: string;
-  /**
-   * The ID of the study program to subscribe to
-   * @format int64
-   */
-  studyProgramId: number;
-}
-
-/** The timetable for a week */
-export interface Timetable {
-  /** The event list for Monday */
-  monday: TimetableEvent[];
-  /** The event list for Tuesday */
-  tuesday: TimetableEvent[];
-  /** The event list for Wednesday */
-  wednesday: TimetableEvent[];
-  /** The event list for Thursday */
-  thursday: TimetableEvent[];
-  /** The event list for Friday */
-  friday: TimetableEvent[];
-  /** The event list for Saturday */
-  saturday: TimetableEvent[];
-  /** The event list for Sunday */
-  sunday: TimetableEvent[];
-}
-
-/** A single event in the timetable */
-export interface TimetableEvent {
-  /**
-   * The ID of the event
-   * @format int64
-   */
-  id: number;
-  /** The department which the timetable event belongs to */
-  department: TimetableEventDepartmentEnum;
-  /** The type of the timetable event */
-  type: TimetableEventTypeEnum;
-  /** The year of study the timetable event is intended for */
-  year: TimetableEventYearEnum;
-  /** The directions/specializations which the event is intended for */
-  directions: (string | null)[];
-  /** Name of the event */
-  name: string;
-  /**
-   * Start date and time of the event
-   * @format date-time
-   */
-  startDateTime: string;
-  /**
-   * End date and time of the event
-   * @format date-time
-   */
-  endDateTime: string;
-  /** The IDs of the study programs this event is intended for */
-  studyProgramIds: number[];
-  /** The IDs of the classrooms the event will take place in */
-  classRoomIds: number[];
-  /** The IDs of the teachers that will teach this event */
-  teacherIds: number[];
-  /** The readable names of the study programs this event is intended for */
-  studyProgramNames: string[];
-  /** The readable names of the classrooms the event will take place in */
-  classRoomNames: string[];
-  /** The readable names of the teachers that will teach this event */
-  teacherNames: string[];
-}
-
-/** A pair of an ID and a name, used in the timetable database */
-export interface IdNamePairLong {
-  /**
-   * The ID of the item
-   * @format int64
-   */
-  id: number;
-  /** The name of the item */
-  name: string;
-}
-
-/** A pair of an ID and a name, used in the timetable database */
-export interface IdNamePairString {
-  /** The ID of the item */
-  id: string;
-  /** The name of the item */
-  name: string;
-}
-
-/** A study program characterized by study year and department */
-export interface StudyProgram {
-  /**
-   * The ID of the study program
-   * @format int64
-   */
-  id: number;
-  /** The full name of the study program */
-  name: string;
-  /** The year of study the timetable event is intended for */
-  studyYear: StudyProgramStudyYearEnum;
-  /** The department which the timetable event belongs to */
-  department: StudyProgramDepartmentEnum;
-  /** The direction/specialization which the study program belongs to */
-  direction: string | null;
-}
-
-/** The database of timetable definitions (names of subjects, teachers, etc.) */
-export interface TimetableDatabase {
-  /** List of study programs */
-  studyPrograms: StudyProgram[];
-  /** List of classrooms (id of the classroom and readable name) */
-  classRooms: IdNamePairLong[];
-  /** List of event types (id of the event type and readable name) */
-  eventTypes: IdNamePairString[];
-  /** List of subjects (id of the subject and readable name) */
-  subjects: IdNamePairLong[];
-  /** List of teachers (id of the teacher and readable name) */
-  teachers: IdNamePairLong[];
-}
-
-/**
- * HTTP status code of the error
- * @example "500"
- */
-export enum FsreErrorStatusEnum {
-  Value100CONTINUE = "100 CONTINUE",
-  Value101SWITCHINGPROTOCOLS = "101 SWITCHING_PROTOCOLS",
-  Value102PROCESSING = "102 PROCESSING",
-  Value103EARLYHINTS = "103 EARLY_HINTS",
-  Value103CHECKPOINT = "103 CHECKPOINT",
-  Value200OK = "200 OK",
-  Value201CREATED = "201 CREATED",
-  Value202ACCEPTED = "202 ACCEPTED",
-  Value203NONAUTHORITATIVEINFORMATION = "203 NON_AUTHORITATIVE_INFORMATION",
-  Value204NOCONTENT = "204 NO_CONTENT",
-  Value205RESETCONTENT = "205 RESET_CONTENT",
-  Value206PARTIALCONTENT = "206 PARTIAL_CONTENT",
-  Value207MULTISTATUS = "207 MULTI_STATUS",
-  Value208ALREADYREPORTED = "208 ALREADY_REPORTED",
-  Value226IMUSED = "226 IM_USED",
-  Value300MULTIPLECHOICES = "300 MULTIPLE_CHOICES",
-  Value301MOVEDPERMANENTLY = "301 MOVED_PERMANENTLY",
-  Value302FOUND = "302 FOUND",
-  Value302MOVEDTEMPORARILY = "302 MOVED_TEMPORARILY",
-  Value303SEEOTHER = "303 SEE_OTHER",
-  Value304NOTMODIFIED = "304 NOT_MODIFIED",
-  Value305USEPROXY = "305 USE_PROXY",
-  Value307TEMPORARYREDIRECT = "307 TEMPORARY_REDIRECT",
-  Value308PERMANENTREDIRECT = "308 PERMANENT_REDIRECT",
-  Value400BADREQUEST = "400 BAD_REQUEST",
-  Value401UNAUTHORIZED = "401 UNAUTHORIZED",
-  Value402PAYMENTREQUIRED = "402 PAYMENT_REQUIRED",
-  Value403FORBIDDEN = "403 FORBIDDEN",
-  Value404NOTFOUND = "404 NOT_FOUND",
-  Value405METHODNOTALLOWED = "405 METHOD_NOT_ALLOWED",
-  Value406NOTACCEPTABLE = "406 NOT_ACCEPTABLE",
-  Value407PROXYAUTHENTICATIONREQUIRED = "407 PROXY_AUTHENTICATION_REQUIRED",
-  Value408REQUESTTIMEOUT = "408 REQUEST_TIMEOUT",
-  Value409CONFLICT = "409 CONFLICT",
-  Value410GONE = "410 GONE",
-  Value411LENGTHREQUIRED = "411 LENGTH_REQUIRED",
-  Value412PRECONDITIONFAILED = "412 PRECONDITION_FAILED",
-  Value413PAYLOADTOOLARGE = "413 PAYLOAD_TOO_LARGE",
-  Value413REQUESTENTITYTOOLARGE = "413 REQUEST_ENTITY_TOO_LARGE",
-  Value414URITOOLONG = "414 URI_TOO_LONG",
-  Value414REQUESTURITOOLONG = "414 REQUEST_URI_TOO_LONG",
-  Value415UNSUPPORTEDMEDIATYPE = "415 UNSUPPORTED_MEDIA_TYPE",
-  Value416REQUESTEDRANGENOTSATISFIABLE = "416 REQUESTED_RANGE_NOT_SATISFIABLE",
-  Value417EXPECTATIONFAILED = "417 EXPECTATION_FAILED",
-  Value418IAMATEAPOT = "418 I_AM_A_TEAPOT",
-  Value419INSUFFICIENTSPACEONRESOURCE = "419 INSUFFICIENT_SPACE_ON_RESOURCE",
-  Value420METHODFAILURE = "420 METHOD_FAILURE",
-  Value421DESTINATIONLOCKED = "421 DESTINATION_LOCKED",
-  Value422UNPROCESSABLEENTITY = "422 UNPROCESSABLE_ENTITY",
-  Value423LOCKED = "423 LOCKED",
-  Value424FAILEDDEPENDENCY = "424 FAILED_DEPENDENCY",
-  Value425TOOEARLY = "425 TOO_EARLY",
-  Value426UPGRADEREQUIRED = "426 UPGRADE_REQUIRED",
-  Value428PRECONDITIONREQUIRED = "428 PRECONDITION_REQUIRED",
-  Value429TOOMANYREQUESTS = "429 TOO_MANY_REQUESTS",
-  Value431REQUESTHEADERFIELDSTOOLARGE = "431 REQUEST_HEADER_FIELDS_TOO_LARGE",
-  Value451UNAVAILABLEFORLEGALREASONS = "451 UNAVAILABLE_FOR_LEGAL_REASONS",
-  Value500INTERNALSERVERERROR = "500 INTERNAL_SERVER_ERROR",
-  Value501NOTIMPLEMENTED = "501 NOT_IMPLEMENTED",
-  Value502BADGATEWAY = "502 BAD_GATEWAY",
-  Value503SERVICEUNAVAILABLE = "503 SERVICE_UNAVAILABLE",
-  Value504GATEWAYTIMEOUT = "504 GATEWAY_TIMEOUT",
-  Value505HTTPVERSIONNOTSUPPORTED = "505 HTTP_VERSION_NOT_SUPPORTED",
-  Value506VARIANTALSONEGOTIATES = "506 VARIANT_ALSO_NEGOTIATES",
-  Value507INSUFFICIENTSTORAGE = "507 INSUFFICIENT_STORAGE",
-  Value508LOOPDETECTED = "508 LOOP_DETECTED",
-  Value509BANDWIDTHLIMITEXCEEDED = "509 BANDWIDTH_LIMIT_EXCEEDED",
-  Value510NOTEXTENDED = "510 NOT_EXTENDED",
-  Value511NETWORKAUTHENTICATIONREQUIRED = "511 NETWORK_AUTHENTICATION_REQUIRED",
-}
-
-/** The department which the timetable event belongs to */
-export enum TimetableEventDepartmentEnum {
-  COMPUTER_SCIENCE = "COMPUTER_SCIENCE",
-  ELECTRICAL_ENGINEERING = "ELECTRICAL_ENGINEERING",
-  MECHANICAL_ENGINEERING = "MECHANICAL_ENGINEERING",
-}
-
-/** The type of the timetable event */
-export enum TimetableEventTypeEnum {
+export enum EventType {
   LECTURE = "LECTURE",
   EXERCISE = "EXERCISE",
   LECTURE_AND_EXERCISE = "LECTURE_AND_EXERCISE",
   LABS = "LABS",
 }
 
-/** The year of study the timetable event is intended for */
-export enum TimetableEventYearEnum {
-  FIRST = "FIRST",
-  SECOND = "SECOND",
-  THIRD = "THIRD",
-  FOURTH = "FOURTH",
-  FIFTH = "FIFTH",
-}
-
-/** The year of study the timetable event is intended for */
-export enum StudyProgramStudyYearEnum {
-  FIRST = "FIRST",
-  SECOND = "SECOND",
-  THIRD = "THIRD",
-  FOURTH = "FOURTH",
-  FIFTH = "FIFTH",
-}
-
-/** The department which the timetable event belongs to */
-export enum StudyProgramDepartmentEnum {
+export enum Department {
   COMPUTER_SCIENCE = "COMPUTER_SCIENCE",
   ELECTRICAL_ENGINEERING = "ELECTRICAL_ENGINEERING",
   MECHANICAL_ENGINEERING = "MECHANICAL_ENGINEERING",
 }
 
-export namespace Messaging {
-  /**
-   * No description
-   * @tags messaging-controller
-   * @name Unsubscribe
-   * @summary Unsubscribe from a study program for a specific email and/or FCM token
-   * @request POST:/messaging/unsubscribe
-   * @response `200` `void` Successfully unsubscribed from a topic
-   * @response `409` `FsreError` Messaging Subscription Already Registered
-   */
-  export namespace Unsubscribe {
-    export type RequestParams = {};
-    export type RequestQuery = {};
-    export type RequestBody = MessagingSubscribeDto;
-    export type RequestHeaders = {};
-    export type ResponseBody = void;
-  }
+export enum StudyYear {
+  FIRST = "FIRST",
+  SECOND = "SECOND",
+  THIRD = "THIRD",
+  FOURTH = "FOURTH",
+  FIFTH = "FIFTH",
+}
 
+export interface TimetableDatabase {
+  studyPrograms: StudyProgram[];
+  classRooms: IdNamePairLong[];
+  eventTypes: IdNamePairString[];
+  subjects: IdNamePairLong[];
+  teachers: IdNamePairLong[];
+}
+
+export interface StudyProgram {
+  /** @example -54 */
+  id: number;
+  /** @example "Preddiplomski studij računarstva- 1. godina" */
+  name: string;
+  studyYear: StudyYear;
+  department: Department;
+  direction: string | null;
+}
+
+export interface IdNamePairLong {
+  id: number;
+  name: string;
+}
+
+export interface IdNamePairString {
+  id: string;
+  name: string;
+}
+
+export interface FsreError {
+  /** @example 502 */
+  status: number;
+  /** @example "Bad Gateway" */
+  error: string;
+  message: string;
+  details?: string;
+}
+
+export interface Timetable {
+  monday: TimetableEvent[];
+  tuesday: TimetableEvent[];
+  wednesday: TimetableEvent[];
+  thursday: TimetableEvent[];
+  friday: TimetableEvent[];
+  saturday: TimetableEvent[];
+  sunday: TimetableEvent[];
+}
+
+export interface TimetableEvent {
+  /** Edupage subject ID */
+  id: number;
+  department: Department | null;
+  type: EventType;
+  year: StudyYear | null;
+  directions: string[] | null;
+  name: string;
+  /**
+   * @format date-time
+   * @example "2026-03-09T07:30:00Z"
+   */
+  startDateTime: string;
+  /**
+   * @format date-time
+   * @example "2026-03-09T09:00:00Z"
+   */
+  endDateTime: string;
+  studyProgramIds: number[];
+  classRoomIds: number[];
+  teacherIds: number[];
+  studyProgramNames: (string | null)[];
+  classRoomNames: (string | null)[];
+  teacherNames: (string | null)[];
+}
+
+export interface MessagingSubscription {
+  /** @format uuid */
+  id: string;
+  channel: MessagingSubscriptionChannelEnum;
+  address: string;
+  studyProgramId: number;
+  timeZone: string;
+  /** @format date-time */
+  createdAt: string;
+  /** @format date-time */
+  lastNotifiedAt: string | null;
+}
+
+export interface MessagingSubscribeDto {
+  /**
+   * Firebase Cloud Messaging registration token
+   * @minLength 1
+   */
+  fcmToken?: string;
+  /** @format email */
+  email?: string;
+  /** @example -54 */
+  studyProgramId: number;
+  /**
+   * IANA time zone that times in notifications are shown in (default Europe/Sarajevo)
+   * @example "Europe/Berlin"
+   */
+  timeZone?: string;
+}
+
+export interface MessagingUnsubscribeDto {
+  /**
+   * Firebase Cloud Messaging registration token
+   * @minLength 1
+   */
+  fcmToken?: string;
+  /** @format email */
+  email?: string;
+  /** @example -54 */
+  studyProgramId: number;
+}
+
+export enum MessagingSubscriptionChannelEnum {
+  Fcm = "fcm",
+  Email = "email",
+}
+
+export namespace TimetableDatabase {
   /**
    * No description
-   * @tags messaging-controller
-   * @name Subscribe
-   * @summary Subscribe to a study program using an email and/or FCM token
-   * @request POST:/messaging/subscribe
-   * @response `200` `MessagingSubscription` Successfully subscribed to a topic
-   * @response `409` `FsreError` Messaging Subscription Already Registered
+   * @name GetTimetableDatabase
+   * @summary Get the timetable definitions database for the current study year
+   * @request GET:/timetable-database
+   * @response `200` `TimetableDatabase` Timetable database retrieved successfully
+   * @response `503` `FsreError` The timetable database has not been loaded from Edupage yet
    */
-  export namespace Subscribe {
+  export namespace GetTimetableDatabase {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = MessagingSubscribeDto;
+    export type RequestBody = never;
     export type RequestHeaders = {};
-    export type ResponseBody = MessagingSubscription;
+    export type ResponseBody = TimetableDatabase;
   }
 }
 
 export namespace Timetable {
   /**
    * No description
-   * @tags timetable-controller
    * @name GetTimetable
    * @summary Get the timetable data for a study program
    * @request GET:/timetable
    * @response `200` `Timetable` Timetable data retrieved successfully
-   * @response `400` `FsreError` Failed to parse ISO week
-   * @response `502` `FsreError` Bad Gateway
+   * @response `400` `FsreError` Invalid study program or ISO week
+   * @response `404` `FsreError` Unknown study program
+   * @response `502` `FsreError` Edupage request failed
+   * @response `503` `FsreError` The timetable database has not been loaded from Edupage yet
    */
   export namespace GetTimetable {
     export type RequestParams = {};
     export type RequestQuery = {
       /**
-       * Study program
-       * @format int64
+       * Study program ID; omit to merge all study programs
        * @example -54
        */
-      studyProgram?: number;
+      studyProgram?: number | null;
       /**
        * ISO week
        * @example "2024-W09"
@@ -358,21 +201,38 @@ export namespace Timetable {
   }
 }
 
-export namespace TimetableDatabase {
+export namespace Messaging {
   /**
-   * No description
-   * @tags timetable-database-controller
-   * @name GetTimetableDatabase
-   * @summary Get the timetable definitions database for the current study year
-   * @request GET:/timetable-database
-   * @response `200` `TimetableDatabase` Timetable database retrieved successfully
+   * @description Idempotent: subscribing again updates the time zone and keeps the subscription from being pruned. Clients should resubscribe when their FCM token or time zone changes.
+   * @name Subscribe
+   * @summary Subscribe an FCM token and/or an email address to timetable changes of a study program
+   * @request POST:/messaging/subscribe
+   * @response `200` `(MessagingSubscription)[]` Subscribed; one subscription per destination
+   * @response `400` `FsreError` Invalid request, unknown study program or an address that cannot receive notifications
+   * @response `503` `FsreError` Timetable database not loaded yet, channel disabled or subscription limit reached
    */
-  export namespace GetTimetableDatabase {
+  export namespace Subscribe {
     export type RequestParams = {};
     export type RequestQuery = {};
-    export type RequestBody = never;
+    export type RequestBody = MessagingSubscribeDto;
     export type RequestHeaders = {};
-    export type ResponseBody = TimetableDatabase;
+    export type ResponseBody = MessagingSubscription[];
+  }
+
+  /**
+   * No description
+   * @name Unsubscribe
+   * @summary Unsubscribe an FCM token and/or an email address from a study program
+   * @request POST:/messaging/unsubscribe
+   * @response `200` `void` Successfully unsubscribed (also if there was no such subscription)
+   * @response `400` `FsreError` Invalid request
+   */
+  export namespace Unsubscribe {
+    export type RequestParams = {};
+    export type RequestQuery = {};
+    export type RequestBody = MessagingUnsubscribeDto;
+    export type RequestHeaders = {};
+    export type ResponseBody = void;
   }
 }
 
@@ -407,13 +267,15 @@ export interface ApiConfig<SecurityDataType = unknown> {
   baseUrl?: string;
   baseApiParams?: Omit<RequestParams, "baseUrl" | "cancelToken" | "signal">;
   securityWorker?: (
-    securityData: SecurityDataType | null,
+    securityData: SecurityDataType | null
   ) => Promise<RequestParams | void> | RequestParams | void;
   customFetch?: typeof fetch;
 }
 
-export interface HttpResponse<D extends unknown, E extends unknown = unknown>
-  extends Response {
+export interface HttpResponse<
+  D extends unknown,
+  E extends unknown = unknown,
+> extends Response {
   data: D;
   error: E;
 }
@@ -429,7 +291,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://mapokapo.zapto.org:5000";
+  public baseUrl: string = "/api";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -468,13 +330,13 @@ export class HttpClient<SecurityDataType = unknown> {
   protected toQueryString(rawQuery?: QueryParamsType): string {
     const query = rawQuery || {};
     const keys = Object.keys(query).filter(
-      (key) => "undefined" !== typeof query[key],
+      key => "undefined" !== typeof query[key]
     );
     return keys
-      .map((key) =>
+      .map(key =>
         Array.isArray(query[key])
           ? this.addArrayQueryParam(query, key)
-          : this.addQueryParam(query, key),
+          : this.addQueryParam(query, key)
       )
       .join("&");
   }
@@ -510,7 +372,7 @@ export class HttpClient<SecurityDataType = unknown> {
             ? property
             : typeof property === "object" && property !== null
               ? JSON.stringify(property)
-              : `${property}`,
+              : `${property}`
         );
         return formData;
       }, new FormData());
@@ -520,7 +382,7 @@ export class HttpClient<SecurityDataType = unknown> {
 
   protected mergeRequestParams(
     params1: RequestParams,
-    params2?: RequestParams,
+    params2?: RequestParams
   ): RequestParams {
     return {
       ...this.baseApiParams,
@@ -535,7 +397,7 @@ export class HttpClient<SecurityDataType = unknown> {
   }
 
   protected createAbortSignal = (
-    cancelToken: CancelToken,
+    cancelToken: CancelToken
   ): AbortSignal | undefined => {
     if (this.abortControllers.has(cancelToken)) {
       const abortController = this.abortControllers.get(cancelToken);
@@ -598,8 +460,8 @@ export class HttpClient<SecurityDataType = unknown> {
           typeof body === "undefined" || body === null
             ? null
             : payloadFormatter(body),
-      },
-    ).then(async (response) => {
+      }
+    ).then(async response => {
       const r = response as HttpResponse<T, E>;
       r.data = null as unknown as T;
       r.error = null as unknown as E;
@@ -608,7 +470,7 @@ export class HttpClient<SecurityDataType = unknown> {
       const data = !responseFormat
         ? r
         : await responseToParse[responseFormat]()
-            .then((data) => {
+            .then(data => {
               if (r.ok) {
                 r.data = data;
               } else {
@@ -616,7 +478,7 @@ export class HttpClient<SecurityDataType = unknown> {
               }
               return r;
             })
-            .catch((e) => {
+            .catch(e => {
               r.error = e;
               return r;
             });
@@ -632,49 +494,27 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title OpenAPI definition
- * @version v0
- * @baseUrl http://mapokapo.zapto.org:5000
+ * @title FSRE Timetable Notify API
+ * @version 2.0.0
+ * @baseUrl /api
  */
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
-  messaging = {
+  timetableDatabase = {
     /**
      * No description
      *
-     * @tags messaging-controller
-     * @name Unsubscribe
-     * @summary Unsubscribe from a study program for a specific email and/or FCM token
-     * @request POST:/messaging/unsubscribe
-     * @response `200` `void` Successfully unsubscribed from a topic
-     * @response `409` `FsreError` Messaging Subscription Already Registered
+     * @name GetTimetableDatabase
+     * @summary Get the timetable definitions database for the current study year
+     * @request GET:/timetable-database
+     * @response `200` `TimetableDatabase` Timetable database retrieved successfully
+     * @response `503` `FsreError` The timetable database has not been loaded from Edupage yet
      */
-    unsubscribe: (data: MessagingSubscribeDto, params: RequestParams = {}) =>
-      this.request<void, FsreError>({
-        path: `/messaging/unsubscribe`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags messaging-controller
-     * @name Subscribe
-     * @summary Subscribe to a study program using an email and/or FCM token
-     * @request POST:/messaging/subscribe
-     * @response `200` `MessagingSubscription` Successfully subscribed to a topic
-     * @response `409` `FsreError` Messaging Subscription Already Registered
-     */
-    subscribe: (data: MessagingSubscribeDto, params: RequestParams = {}) =>
-      this.request<MessagingSubscription, FsreError>({
-        path: `/messaging/subscribe`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
+    getTimetableDatabase: (params: RequestParams = {}) =>
+      this.request<TimetableDatabase, FsreError>({
+        path: `/timetable-database`,
+        method: "GET",
         format: "json",
         ...params,
       }),
@@ -683,29 +523,29 @@ export class Api<
     /**
      * No description
      *
-     * @tags timetable-controller
      * @name GetTimetable
      * @summary Get the timetable data for a study program
      * @request GET:/timetable
      * @response `200` `Timetable` Timetable data retrieved successfully
-     * @response `400` `FsreError` Failed to parse ISO week
-     * @response `502` `FsreError` Bad Gateway
+     * @response `400` `FsreError` Invalid study program or ISO week
+     * @response `404` `FsreError` Unknown study program
+     * @response `502` `FsreError` Edupage request failed
+     * @response `503` `FsreError` The timetable database has not been loaded from Edupage yet
      */
     getTimetable: (
       query: {
         /**
-         * Study program
-         * @format int64
+         * Study program ID; omit to merge all study programs
          * @example -54
          */
-        studyProgram?: number;
+        studyProgram?: number | null;
         /**
          * ISO week
          * @example "2024-W09"
          */
         isoWeek: string;
       },
-      params: RequestParams = {},
+      params: RequestParams = {}
     ) =>
       this.request<Timetable, FsreError>({
         path: `/timetable`,
@@ -715,21 +555,42 @@ export class Api<
         ...params,
       }),
   };
-  timetableDatabase = {
+  messaging = {
+    /**
+     * @description Idempotent: subscribing again updates the time zone and keeps the subscription from being pruned. Clients should resubscribe when their FCM token or time zone changes.
+     *
+     * @name Subscribe
+     * @summary Subscribe an FCM token and/or an email address to timetable changes of a study program
+     * @request POST:/messaging/subscribe
+     * @response `200` `(MessagingSubscription)[]` Subscribed; one subscription per destination
+     * @response `400` `FsreError` Invalid request, unknown study program or an address that cannot receive notifications
+     * @response `503` `FsreError` Timetable database not loaded yet, channel disabled or subscription limit reached
+     */
+    subscribe: (data: MessagingSubscribeDto, params: RequestParams = {}) =>
+      this.request<MessagingSubscription[], FsreError>({
+        path: `/messaging/subscribe`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
     /**
      * No description
      *
-     * @tags timetable-database-controller
-     * @name GetTimetableDatabase
-     * @summary Get the timetable definitions database for the current study year
-     * @request GET:/timetable-database
-     * @response `200` `TimetableDatabase` Timetable database retrieved successfully
+     * @name Unsubscribe
+     * @summary Unsubscribe an FCM token and/or an email address from a study program
+     * @request POST:/messaging/unsubscribe
+     * @response `200` `void` Successfully unsubscribed (also if there was no such subscription)
+     * @response `400` `FsreError` Invalid request
      */
-    getTimetableDatabase: (params: RequestParams = {}) =>
-      this.request<TimetableDatabase, any>({
-        path: `/timetable-database`,
-        method: "GET",
-        format: "json",
+    unsubscribe: (data: MessagingUnsubscribeDto, params: RequestParams = {}) =>
+      this.request<void, FsreError>({
+        path: `/messaging/unsubscribe`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };
