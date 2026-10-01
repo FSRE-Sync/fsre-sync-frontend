@@ -9,7 +9,7 @@ const dirname = import.meta.dirname;
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   preview: {
-    allowedHosts: ["fsre-app.mapokapo.cc"],
+    allowedHosts: ["fsre-sync.mapokapo.cc"],
     port: 3000,
   },
   resolve: {
