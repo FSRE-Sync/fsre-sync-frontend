@@ -40,6 +40,31 @@ interface Props {
   timetable: Timetable;
 }
 
+/** Stable left-to-right order when overlapping events share a grid cell. */
+function compareTimetableEventsForLayout(
+  a: TimetableEvent,
+  b: TimetableEvent
+): number {
+  if (a.id !== b.id) {
+    return a.id - b.id;
+  }
+  return a.name.localeCompare(b.name);
+}
+
+function timetableEventsOverlapInTime(
+  a: TimetableEvent,
+  b: TimetableEvent
+): boolean {
+  if (a.id === b.id && a.name === b.name) {
+    return false;
+  }
+  const aStart = new Date(a.startDateTime).getTime();
+  const aEnd = new Date(a.endDateTime).getTime();
+  const bStart = new Date(b.startDateTime).getTime();
+  const bEnd = new Date(b.endDateTime).getTime();
+  return aStart < bEnd && aEnd > bStart;
+}
+
 const TimetableView: React.FC<Props> = ({ isoWeek, timetable }) => {
   const timetableEvents = (Object.values(timetable) as TimetableEvent[]).flat();
 
@@ -153,30 +178,15 @@ const TimetableView: React.FC<Props> = ({ isoWeek, timetable }) => {
 
             const isSmall = endIndex - startIndex <= 6;
 
-            // check for both left and right events
-            // events can have the same id or name, and can have the same start and end dates
-            // only way to differentiate them is to check their id and name
-            // the first and second events are positioned either using id (lower value is left) or name (lower alphabetically is left)
-            const isOverlappedWithAnotherEvent = timetableEvents.some(event => {
-              return (
-                (event.id !== timetableEvent.id ||
-                  event.name !== timetableEvent.name) &&
-                new Date(event.startDateTime).getTime() < endDate.getTime() &&
-                new Date(event.endDateTime).getTime() > startDate.getTime()
-              );
-            });
+            const isOverlappedWithAnotherEvent = timetableEvents.some(event =>
+              timetableEventsOverlapInTime(event, timetableEvent)
+            );
 
-            // the second event is higher in id value or alphabetically by nae
-            const isSecondEventInOverlapCase = timetableEvents.some(event => {
-              return (
-                (event.id !== timetableEvent.id ||
-                  event.name !== timetableEvent.name) &&
-                new Date(event.startDateTime).getTime() < endDate.getTime() &&
-                new Date(event.endDateTime).getTime() > startDate.getTime() &&
-                (event.id < timetableEvent.id ||
-                  event.name < timetableEvent.name)
-              );
-            });
+            const isSecondEventInOverlapCase = timetableEvents.some(
+              event =>
+                timetableEventsOverlapInTime(event, timetableEvent) &&
+                compareTimetableEventsForLayout(event, timetableEvent) < 0
+            );
 
             return (
               <td
